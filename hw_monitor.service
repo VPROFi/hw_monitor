@@ -1,0 +1,23 @@
+[Unit]
+Description=SmartMonitor Hardware Monitor Service
+After=network.target local-fs.target
+
+[Service]
+Type=simple
+# Скрипт установщик автоматически заменит vadim на ваше имя пользователя
+User=vadim
+Group=vadim
+
+WorkingDirectory=/opt/hw_monitor
+ExecStart=/usr/bin/python3 /opt/hw_monitor/monitor.py
+
+# Автоматический перезапуск при падении (например, если отключили USB)
+Restart=on-failure
+RestartSec=5
+
+# Перенаправление вывода в системный журнал (journalctl)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

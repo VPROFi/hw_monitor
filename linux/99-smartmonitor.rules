@@ -1,0 +1,41 @@
+# SmartMonitor 3.5" USB HID panel (0483:0065)
+#
+# hidraw nodes are root-only by default. This grants the logged-in user access
+# so the panel can be driven without sudo.
+#
+#   sudo cp tools/99-smartmonitor.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules && sudo udevadm trigger
+#
+# Then unplug and replug the panel -- udev applies rules at device add time,
+# so an already-connected device keeps its old permissions until it reappears.
+#
+# TAG+="uaccess" is the modern mechanism (systemd-logind grants the active
+# seat's user an ACL). GROUP/MODE is the fallback for systems without it;
+# add yourself to plugdev if you rely on that path.
+
+# === SmartMonitor 3.5" (VID 0483, PID 0065) ===
+
+# 1. Права на hidraw-устройство
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0065", \
+    TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# 2. Права на родительское USB-устройство
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0065", \
+    TAG+="uaccess", GROUP="plugdev", MODE="0660"
+
+# 3. Запрет autosuspend на самом устройстве (add И change)
+ACTION=="add|change", SUBSYSTEM=="usb", \
+    ATTR{idVendor}=="0483", ATTR{idProduct}=="0065", \
+    ATTR{power/control}="on"
+
+# 4. Запрет autosuspend на родительском USB-порту/hub
+#    Это критично: если хаб усыпит порт, устройство тоже уснёт
+ACTION=="add|change", SUBSYSTEM=="usb", \
+    ATTR{idVendor}=="0483", ATTR{idProduct}=="0065", \
+    ENV{DEVTYPE}=="usb_device", \
+    RUN+="/bin/sh -c 'echo on > /sys$devpath/../power/control 2>/dev/null || true'"
+
+# 5. Запрет autosuspend на уровне драйвера usbhid
+ACTION=="add|change", SUBSYSTEM=="usb", DRIVER=="usbhid", \
+    ATTR{idVendor}=="0483", ATTR{idProduct}=="0065", \
+    ATTR{power/control}="on"

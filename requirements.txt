@@ -1,0 +1,4 @@
+# Python packages requirements
+# Image generation
+Pillow~=11.3.0; python_version < "3.10"   # For Python 3.9, only Pillow 11.x is supported
+Pillow~=12.1.1; python_version >= "3.10"  # For Python 3.10+, any Pillow 12.x is fine

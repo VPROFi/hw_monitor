@@ -1,0 +1,3 @@
+# Делаем файлы powercap (Intel RAPL) читаемыми для всех
+SUBSYSTEM=="powercap", ACTION=="add|change", RUN+="/bin/chmod -R a+r /sys/%p"
+   
