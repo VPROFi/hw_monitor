@@ -20,7 +20,7 @@ Restart=on-failure
 RestartSec=5
 
 # Перенаправление вывода в системный журнал (journalctl)
-StandardOutput=journal
+StandardOutput=null
 StandardError=journal
 
 [Install]
