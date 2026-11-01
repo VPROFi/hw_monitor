@@ -13,7 +13,10 @@ WorkingDirectory=/opt/hw_monitor
 # повторять попытку каждые 5 секунд, пока устройство не будет подключено.
 ExecStartPre=/bin/sh -c '/usr/bin/lsusb -d 0483:0065 >/dev/null 2>&1 || exit 1'
 
-ExecStart=/usr/bin/python3 /opt/hw_monitor/monitor.py
+# Запрещаем Python создавать __pycache__ и .pyc файлы
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+ExecStart=/usr/bin/python3 -B /opt/hw_monitor/monitor.py
 
 # Автоматический перезапуск при падении (например, если отключили USB)
 Restart=on-failure
