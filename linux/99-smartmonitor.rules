@@ -39,3 +39,9 @@ ACTION=="add|change", SUBSYSTEM=="usb", \
 ACTION=="add|change", SUBSYSTEM=="usb", DRIVER=="usbhid", \
     ATTR{idVendor}=="0483", ATTR{idProduct}=="0065", \
     ATTR{power/control}="on"
+
+# Когда устройство подключается -> запускаем службу
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0065", TAG+="systemd", ENV{SYSTEMD_WANTS}="hw_monitor.service"
+
+# Когда устройство отключается -> останавливаем службу
+ACTION=="remove", SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="0065", RUN+="/bin/systemctl stop hw_monitor.service"
